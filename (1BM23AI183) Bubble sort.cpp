@@ -2,24 +2,22 @@
 #include <stdlib.h>
 #include <time.h>
 
-// Bubble sort function with time and operation count tracking
 void bubbleSort(int arr[], int n, int *operationCount, double *timeTaken) {
     clock_t start, end;
     start = clock();
 
     int temp;
-    *operationCount = 0; // Initialize operation count
+    *operationCount = 0;
 
-    // Bubble Sort Algorithm
     for (int i = 0; i < n-1; i++) {
         for (int j = 0; j < n-i-1; j++) {
-            (*operationCount)++; // Increment operation count for comparison
+            (*operationCount)++; 
             if (arr[j] > arr[j+1]) {
                 // Swap the elements
                 temp = arr[j];
                 arr[j] = arr[j+1];
                 arr[j+1] = temp;
-                (*operationCount)++; // Increment operation count for swap
+                (*operationCount)++; 
             }
         }
     }
@@ -28,7 +26,7 @@ void bubbleSort(int arr[], int n, int *operationCount, double *timeTaken) {
     *timeTaken = ((double)(end - start)) / CLOCKS_PER_SEC;
 }
 
-// Function to print an array
+
 void printArray(int arr[], int n) {
     for (int i = 0; i < n; i++) {
         printf("%d ", arr[i]);
@@ -42,13 +40,11 @@ int main() {
     scanf("%d", &n);
 
     int arr[n];
-
-    // Seed for random number generation
+   
     srand(time(NULL));
 
-    // Generate random numbers and store them in the array
     for (int i = 0; i < n; i++) {
-        arr[i] = rand() % 1000; // Random number between 0 and 999
+        arr[i] = rand() % 1000;
     }
 
     printf("Generated Random Array:\n");
@@ -57,7 +53,6 @@ int main() {
     int operationCount = 0;
     double timeTaken;
 
-    // Call bubbleSort and track the time taken and operations count
     bubbleSort(arr, n, &operationCount, &timeTaken);
 
     printf("\nSorted Array:\n");
