@@ -1,0 +1,109 @@
+#include <stdio.h>
+#include <stdbool.h>
+#include <limits.h>
+
+#define MAX_VERTICES 10  // Maximum number of vertices
+
+// Function prototypes
+int minKey(int key[], bool mstSet[], int V);
+void printMST(int parent[], int V, int graph[MAX_VERTICES][MAX_VERTICES]);
+int primMST(int V, int graph[MAX_VERTICES][MAX_VERTICES]);
+
+int main() {
+    int V;  // Number of vertices
+    int graph[MAX_VERTICES][MAX_VERTICES];
+    int i, j;
+    int total_cost;
+
+    printf("Enter the number of vertices (max %d): ", MAX_VERTICES);
+    scanf("%d", &V);
+
+    if (V <= 0 || V > MAX_VERTICES) {
+        printf("Invalid number of vertices. Must be between 1 and %d.\n", MAX_VERTICES);
+        return 1;
+    }
+
+    printf("Enter the adjacency matrix (%d x %d):\n", V, V);
+    printf("(Enter 0 if there is no edge between vertices)\n");
+    for (i = 0; i < V; i++) {
+        printf("Row %d: ", i);
+        for (j = 0; j < V; j++) {
+            scanf("%d", &graph[i][j]);
+        }
+    }
+
+    // Calculate and print the MST
+    total_cost = primMST(V, graph);
+    printf("\nTotal Minimum Cost of MST: %d\n", total_cost);
+
+    return 0;
+}
+
+int minKey(int key[], bool mstSet[], int V) {
+    int min = INT_MAX, min_index;
+    int v;
+
+    for (v = 0; v < V; v++) {
+        if (mstSet[v] == false && key[v] < min) {
+            min = key[v];
+            min_index = v;
+        }
+    }
+
+    return min_index;
+}
+
+void printMST(int parent[], int V, int graph[MAX_VERTICES][MAX_VERTICES]) {
+    int i;
+    printf("\nMinimum Spanning Tree (MST) Edges:\n");
+    printf("Edge \tWeight\n");
+    for (i = 1; i < V; i++) {
+        printf("%d - %d \t%d \n", parent[i], i, graph[i][parent[i]]);
+    }
+}
+
+int primMST(int V, int graph[MAX_VERTICES][MAX_VERTICES]) {
+    int parent[MAX_VERTICES];  // Array to store constructed MST
+    int key[MAX_VERTICES];     // Key values used to pick minimum weight edge
+    bool mstSet[MAX_VERTICES]; // To represent set of vertices included in MST
+    int i, count, u, v;
+    int total_cost = 0;
+
+    // Initialize all keys as INFINITE and mstSet[] as false
+    for (i = 0; i < V; i++) {
+        key[i] = INT_MAX;
+        mstSet[i] = false;
+    }
+
+    // Always include first vertex in MST
+    key[0] = 0;         // Make key 0 so this vertex is picked first
+    parent[0] = -1;     // First node is always root of MST
+
+    // The MST will have V vertices
+    for (count = 0; count < V - 1; count++) {
+        // Pick the minimum key vertex not yet included in MST
+        u = minKey(key, mstSet, V);
+
+        // Add the picked vertex to the MST Set
+        mstSet[u] = true;
+
+        // Update key values and parent indices of adjacent vertices
+        for (v = 0; v < V; v++) {
+            // Update only if there's an edge, vertex not in MST, and weight is smaller than current key
+            if (graph[u][v] && mstSet[v] == false && graph[u][v] < key[v]) {
+                parent[v] = u;
+                key[v] = graph[u][v];
+            }
+        }
+    }
+
+    // Calculate total cost by summing all edge weights in MST
+    for (i = 1; i < V; i++) {
+        total_cost += graph[i][parent[i]];
+    }
+
+    // Print the constructed MST
+    printMST(parent, V, graph);
+
+    return total_cost;
+}
