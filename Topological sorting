@@ -1,0 +1,97 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
+
+#define MAX 26  // Maximum vertices (A-Z or 0-25)
+
+int adj[MAX][MAX];
+int visited[MAX];
+int stack[MAX];
+int top = -1;
+
+void dfs(int v, int n) {
+    visited[v] = 1;
+    for (int i = 0; i < n; i++) {
+        if (adj[v][i] && !visited[i]) {
+            dfs(i, n);
+        }
+    }
+    stack[++top] = v;
+}
+
+void topologicalSort(int n) {
+    for (int i = 0; i < n; i++)
+        visited[i] = 0;
+
+    for (int i = 0; i < n; i++) {
+        if (!visited[i])
+            dfs(i, n);
+    }
+
+    printf("Topological Sort: ");
+    while (top != -1) {
+        if (n <= 26) {
+            printf("%c ", stack[top] + 'A');  // Convert index to alphabet
+        } else {
+            printf("%d ", stack[top]);        // Print as number
+        }
+        top--;
+    }
+    printf("\n");
+}
+
+int parseVertex(char* input, int max_vertices) {
+    if (isdigit(input[0])) {
+        int num = atoi(input);
+        if (num >= 0 && num < max_vertices) {
+            return num;
+        }
+    } else if (isalpha(input[0])) {
+        char upper = toupper(input[0]);
+        if (upper - 'A' < max_vertices) {
+            return upper - 'A';
+        }
+    }
+    return -1; // Invalid input
+}
+
+int main() {
+    int n, e;
+    char u_input[10], v_input[10];
+    int u, v;
+
+    printf("Enter number of vertices (max %d): ", MAX);
+    scanf("%d", &n);
+    if (n <= 0 || n > MAX) {
+        printf("Invalid number of vertices. Must be between 1 and %d.\n", MAX);
+        return 1;
+    }
+
+    // Initialize adjacency matrix
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < n; j++)
+            adj[i][j] = 0;
+
+    printf("Enter number of edges: ");
+    scanf("%d", &e);
+
+    printf("Enter edges (e.g. A B or 0 1 means A->B or 0->1):\n");
+    for (int i = 0; i < e; i++) {
+        scanf("%s %s", u_input, v_input);
+
+        u = parseVertex(u_input, n);
+        v = parseVertex(v_input, n);
+
+        if (u == -1 || v == -1) {
+            printf("Invalid vertex input. Please use letters (A-Z) or numbers (0-%d).\n", n-1);
+            i--; // Retry this edge
+            continue;
+        }
+
+        adj[u][v] = 1;
+    }
+
+    topologicalSort(n);
+
+    return 0;
+}
